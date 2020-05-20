@@ -1,15 +1,40 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
+import { USERLOGIN, USERLOGOUT, SETCRUMBOBJ } from './type'
 
 Vue.use(Vuex)
 
-export default new Vuex.Store({
-  state: {
+const state = {
+  isLogin: false,
+  token: null,
+  crumbObj: {}
+}
+
+const mutations = {
+  [USERLOGIN](state, payload) {
+    state.isLogin = true
+    state.token = payload
+    window.sessionStorage.setItem('token', payload)
+    window.sessionStorage.setItem('isLogin', true)
   },
-  mutations: {
+  [USERLOGOUT](state) {
+    state.isLogin = false
+    state.token = null
+    window.sessionStorage.clear('token')
+    window.sessionStorage.clear('isLogin')
   },
-  actions: {
-  },
-  modules: {
+  [SETCRUMBOBJ](state, payload) {
+    state.crumbObj = payload
+    window.sessionStorage.setItem('crumbObj', JSON.stringify(payload))
   }
+}
+
+const getters = {
+  token: (state) => state.token
+}
+
+export default new Vuex.Store({
+  state,
+  mutations,
+  getters
 })
