@@ -9,16 +9,32 @@ body,
   padding: 0;
   min-width: 1366px;
 }
+
 div {
   box-sizing: border-box;
 }
+
 ul {
   list-style: none;
 }
+
 li {
   padding: 0;
   margin: 0;
 }
+
 h1 {
   margin: 0;
+}
+
+.el-row {
+  margin: 10px 0;
+}
+
+.el-alert {
+  margin: 10px auto;
+}
+
+.el-steps {
+  margin: 10px auto;
 }

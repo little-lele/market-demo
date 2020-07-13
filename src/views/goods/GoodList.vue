@@ -1,6 +1,15 @@
 <template>
   <div class="goods">
-    <h1>商品列表</h1>
+    <el-row :gutter="20">
+      <el-col :span='8'>
+        <search-bar @searchItem='searchBtn' @clearItem="clearBtn">
+        </search-bar>
+      </el-col>
+      <el-col :span="4">
+        <el-button type='primary' @click="addGoods">添加商品</el-button>
+      </el-col>
+    </el-row>
+
     <table-list :columns="columns" :tableData="tableData">
       <template slot-scope="scope" slot="actionColumn">
         <div>
@@ -9,23 +18,18 @@
         </div>
       </template>
     </table-list>
-    <el-pagination
-      @size-change="handleSizeChange"
-      @current-change="handleCurrentChange"
-      :current-page="queryInfo.currentPage"
-      :page-sizes="[3, 6, 6, 8]"
-      :page-size="queryInfo.pageSize"
-      layout="total, sizes, prev, pager, next, jumper"
-      :total="total"
-    ></el-pagination>
+    <el-pagination @size-change="handleSizeChange" @current-change="handleCurrentChange"
+      :current-page="queryInfo.currentPage" :page-sizes="[5, 10, 20,50]" :page-size="queryInfo.pageSize"
+      layout="total, sizes, prev, pager, next, jumper" :total="total"></el-pagination>
   </div>
 </template>
 <script>
+import SearchBar from "../../components/SearchBar.vue"
 import TableList from "../../components/tableList.vue";
 import { getGoodsList } from "../../api/index.js";
 export default {
-  components: { TableList },
-  data() {
+  components: { TableList, SearchBar },
+  data () {
     return {
       pageData_: {
         pageSize: 5,
@@ -85,36 +89,51 @@ export default {
     };
   },
   methods: {
-    initData() {
-      const { query, pagenum, pagesize } = this.queryInfo;
-      getGoodsList(query, pagenum, pagesize).then(res => {
-        console.log(res.data.goods, res);
-        if (res.meta.status == 200) {
-          this.$message.success({
-            message: res.meta.msg,
-            duration: 2000,
-            center: true
-          });
-          this.tableData = res.data.goods;
-          this.total = res.data.total;
-        }
-      });
+    async initData (queryInfo) {
+      const { query, pagenum, pagesize } = queryInfo;
+      const res = await getGoodsList(query, pagenum, pagesize)
+      console.log(res.data.goods, res);
+      if (res.meta.status == 200) {
+        this.$message.success({
+          message: res.meta.msg,
+          duration: 2000,
+          center: true
+        });
+        this.tableData = res.data.goods;
+        this.total = res.data.total;
+      }
+      ;
     },
-    handleSizeChange(arg) {
+    handleSizeChange (arg) {
       console.log(arg);
       this.queryInfo.pagesize = arg;
-      this.initData();
+      this.initData(this.queryInfo);
     },
-    handleCurrentChange(arg) {
+    handleCurrentChange (arg) {
       console.log(arg);
       this.queryInfo.pagenum = arg;
-      this.initData();
+      this.initData(this.queryInfo);
     },
-    toAction(row, op) {},
-    toDetail(row, op) {}
+    toAction (row, op) { },
+    toDetail (row, op) { },
+    searchBtn (query) {
+      this.queryInfo.query = query
+      console.log(query);
+      this.initData(this.queryInfo);
+    },
+    clearBtn () {
+      this.queryInfo.query = '',
+        this.queryInfo.pagenum = 1,
+        this.queryInfo.pagesize = 5,
+        this.initData(this.queryInfo);
+    },
+    //添加商品按钮
+    addGoods () {
+      this.$router.push({ name: 'addgoods' })
+    }
   },
-  created() {
-    this.initData();
+  created () {
+    this.initData(this.queryInfo);
   }
 };
 </script>
